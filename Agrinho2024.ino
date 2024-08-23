@@ -80,14 +80,14 @@ void setup() {
   digitalWrite(6, LOW);//Desliga os relés de abrir.
   digitalWrite(7, LOW);//Desliga os relés de fechar.
 
-
+  Serial.begin(9600);
 }
 
 void loop() {
   delay(500);
   //Se o botão de abrir for pressionado, chama a função "open".
   if (digitalRead(2) == LOW) {//Lê o status do botão abrir e define a variável automatic como 0.
-    Open(25);//Função open.
+    Open(30);//Função open.
     open = 1;
     automatic = 0;
   }
@@ -96,7 +96,7 @@ void loop() {
 
   //Se o botão de fechar for pressionado, chama a função "close" e define a variável automatic como 0.  
   if (digitalRead(3) == LOW) {//Lê o status do botão fechar.
-    Close(25);//Função close.
+    Close(24);//Função close.
     close = 1;
     automatic = 0;
   }
@@ -105,7 +105,7 @@ void loop() {
 
   //Se o botão do automático for pressionado, define a variável automatic como 1 e liga o led verde. 
   if(digitalRead(4) == LOW){//Lê o status do botão automático.
-    automatic = 1;
+    automatic = 0;
     auto_open = 0;
     auto_close = 0;
   } 
@@ -123,20 +123,24 @@ void loop() {
  if(digitalRead(5) == LOW && automatic == 1 && auto_open == 0){ //Verifica se o sensor de chuva está molhado ou não.
     //Caso não esteja, chama a função de abrir, caso contrario, chama a função de fechar.
     open = 1;
-    Open(25);
+    Open(35);
     auto_close = 0;
   }else if(digitalRead(5) == HIGH && automatic == 1 && auto_close == 0){
     close = 1;
-    Close(25);
+    Close(24);
     auto_open = 0;
   }
 
+  Serial.println(digitalRead(3));
+  Serial.println(digitalRead(4));
+  Serial.println(digitalRead(5));
 }
 
 
 void Open(int distance){//Definir o ultrassônico e a distancia.
   while (open == 1) {
     ub = 0.01723 * Ultrassonic_back(11, 12);//Leitura do ultrassônico aberto(trig, Echo).
+      Serial.println(ub);
     if(ub > distance){
       digitalWrite(6, HIGH);//Liga os relés para abrir o telhado.
     }else{
@@ -144,6 +148,7 @@ void Open(int distance){//Definir o ultrassônico e a distancia.
       auto_open = 1;
       open = 0; //Para o loop.
     }
+    delay(1000);
   }
 }
 
@@ -151,6 +156,7 @@ void Open(int distance){//Definir o ultrassônico e a distancia.
 void Close(int distance){//Definir o ultrassônico e a distancia.
   while (close == 1) {
      uf = 0.01723 * Ultrassonic_front(9, 10);//Leitura do ultrassônico fechado(Trig, Echo).
+       Serial.println(uf);
      if(uf > distance){
       digitalWrite(7, HIGH);//Liga os relés para abrir o telhado.
     }else{
@@ -158,6 +164,6 @@ void Close(int distance){//Definir o ultrassônico e a distancia.
       auto_close = 1;
       close = 0; //Para o loop.
     }
+    delay(1000);
   }
 }
-
